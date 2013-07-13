@@ -1,0 +1,5 @@
+*.class
+lib/batman.jar
+*~
+bin/*
+batman/*

@@ -1,0 +1,4 @@
+Manifest-Version: 1.0
+Class-Path: biojava.jar bjv2-core-0.1.jar bytecode.jar colt.jar
+
+

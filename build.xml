@@ -1,0 +1,158 @@
+<?xml version="1.0"?>
+
+<!--
+
+  Ant build file Batman
+
+  see:
+  <a href="http://ant.apache.org/">Ant Project Homepage</a>
+
+  author:  Thomas Down
+
+  portions based on the biojava build.xml file by:
+           Michael Heuer
+           Keith James (JUnit support, DocBook support)
+           Greg Cox (fixed documentation)
+
+  portions Copyright (c) 1999-2000 The Apache Software Foundation.
+
+-->
+
+<project name="batman" default="all" basedir=".">
+  <property environment="env" />
+
+  <target name="all" depends="package-java" />
+
+  <!-- Checks environment and setup variables -->
+  <target name="init" description="Checks environment and setup variables">
+    <tstamp />
+    <property name="version" value="0.1" />
+
+    <property name="build.compiler" value="modern" />
+
+    <property name="bin.dir" value="./bin" />
+    <property name="lib.dir" value="./lib" />
+    <property name="src.main.dir" value="./src" />
+    <property name="manifest.dir" value="./manifest" />
+    <property name="resources.dir" value="./resources" />
+
+    <property name="classpath" value="${lib.dir}/biojava.jar:${lib.dir}/bytecode.jar:${lib.dir}/bjv2-core-0.1.jar:${lib.dir}/stax-api-1.0.1.jar:${lib.dir}/colt.jar" />
+ 
+    <!-- Main build directory -->
+    <property name="build.dir" value="./ant-build" />
+    <property name="build.classes.dir" value="${build.dir}/classes" />
+
+    <!-- Javac properties -->
+    <property name="javac.depend" value="false" />
+    <property name="javac.debug" value="true" />
+    <property name="javac.deprecation" value="false" />
+    <property name="javac.source" value="1.5" />
+
+    <!-- Javadoc properties -->
+    <property name="build.dest.docs" value="${build.dir}/docs" />
+    <property name="build.dest.doccheck" value="${build.dir}/docs/check" />
+    <property name="packages" value="net.*" />
+
+    <!-- Subdirectories for main source and classes -->
+    <property name="name.main" value="batman" />
+    <property name="Name.main" value="Batman" />
+    <property name="build.dest.main" value="${build.classes.dir}/${name.main}" />
+    <property name="build.docs.main" value="${build.dest.docs}/${name.main}" />
+    <property name="jar.main" value="${lib.dir}/${name.main}.jar" />
+    <property name="manifest.file.main" value="${manifest.dir}/${name.main}.txt" />
+
+    <!-- Echo information -->
+    <echo message="Building ${name.main}-${version}" />
+  </target>
+
+
+  <!--
+    Prepare each part of the project.
+
+    Each preparation creates working directories and copies files over.
+  -->
+
+  <!-- Prepares the basic stuff -->
+  <target name="prepare" depends="init" description="creates basic directories">
+    <!-- Creates directories -->
+    <mkdir dir="${build.dir}" />
+    <mkdir dir="${bin.dir}" />
+  </target>
+  
+  <!-- Prepares the source code -->
+  <target name="prepare-java" depends="prepare" description="Prepares java source files">
+    <!-- Creates directories -->
+    <mkdir dir="${build.dest.main}" />
+    <mkdir dir="${build.docs.main}" />
+  </target>
+
+  <!-- Prepares the javadocs -->
+  <target name="prepare-javadocs" depends="prepare" description="Prepares the javadocs">
+    <!-- Creates directories -->
+    <mkdir dir="${build.dest.docs}" />
+  </target>
+
+
+  <!-- Compiles the source directory -->
+  <target name="compile-java" depends="prepare-java" description="Compiles the java source code">
+    <apt
+      destdir="${build.dest.main}"
+      depend="${javac.depend}"
+      deprecation="${javac.deprecation}"
+      debug="${javac.debug}"
+      srcdir="${src.main.dir}">
+      <classpath>
+        <pathelement path="${classpath}" />
+	<pathelement path="${build.dest.build}" />
+      </classpath>
+
+      <filename name="batman/**/*.java" />
+    </apt>
+  </target>
+
+
+  <!--
+    Creates the .jar files containing each distributable component.
+
+    This probably just jars up the .class files and any resources as well as
+    a manifest for each distributable component.
+  -->
+
+  <!-- Creates the biojava package (tests are left in the parallel tree) -->
+  
+  <target name="package-java" depends="compile-java" description="create main class jar file">
+    <jar
+      jarfile="${jar.main}"
+      manifest="${manifest.file.main}"
+    >
+      <fileset dir="${build.dest.main}" />
+      <fileset dir="${resources.dir}" />
+    </jar>
+  </target>
+
+  <!-- Creates the API documentation -->
+  <target name="javadocs" depends="prepare-java" description="Creates the API documentation">
+    <javadoc
+      packagenames="${packages}"
+      sourcepath="${src.dir}"
+      classpath="${classpath}"
+      destdir="${build.docs.main}"
+      author="true"
+      version="true"
+      use="true"
+      source="1.4"
+      windowtitle="${Name.main} API"
+      doctitle="${Name.main}"
+      maxmemory="96m">
+       <link href="http://java.sun.com/j2se/1.4.2/docs/api/" offline="false" />
+       <link href="http://www.derkholm.net/autobuild/latest-docs/docs/biojava/" offline="false" />
+    </javadoc>
+  </target>
+
+
+  <!-- Cleans everything -->
+  <target name="clean" depends="init"
+  description="Cleans everything">
+    <delete dir="${build.dir}" />
+  </target>
+</project>
